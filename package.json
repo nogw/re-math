@@ -1,0 +1,29 @@
+{
+  "name": "parser-math",
+  "version": "1.0.0",
+  "license": "MIT",
+  "esy": {
+    "build": "dune build -p parser-math",
+    "buildsInSource": "_build",
+    "release": {
+      "releasedBinaries": [
+        "math.exe"
+      ]
+    }
+  },
+  "scripts": {
+	"start": "esy x math.exe"
+  },
+  "dependencies": {
+    "ocaml": "~4.11.0",
+	"@esy-ocaml/reason": "^3.7.0",
+	"@opam/dune": "*",
+	"@opam/ppx_deriving": "^4.5",
+	"@reason-native/console": "*",
+	"@reason-native/pastel": "*"
+  },
+  "devDependencies": {
+    "@opam/merlin": "4.4-411",
+    "@opam/ocaml-lsp-server": "1.4.1"
+  }
+}
