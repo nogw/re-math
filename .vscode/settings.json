@@ -1,0 +1,7 @@
+{
+    "ocaml.sandbox": {
+        "kind": "opam",
+        "switch": "4.11.0"
+    },
+    "reason.path.ocamlmerlin": "/home/nogw/.opam/4.11.0/bin/ocamlmerlin"
+}

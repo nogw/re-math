@@ -98,14 +98,14 @@ let () = {
     cli_usage();
   } else if (len <= 2) {
     read_file(Sys.argv[1]) |> interprete |> show_expression |> print_endline;
-  };
+  } else {
+    let (filename, opt) = (Sys.argv[1], Sys.argv[2]);
 
-  let (filename, opt) = (Sys.argv[1], Sys.argv[2]);
-
-  switch (opt) {
-  | "--ast" =>
-    read_file(filename) |> parse |> show_expression |> print_endline
-  | "--help" => cli_usage()
-  | _ => print_endline("Invalid option.\n")
+    switch (opt) {
+    | "--ast" =>
+      read_file(filename) |> parse |> show_expression |> print_endline
+    | "--help" => cli_usage()
+    | _ => print_endline("Invalid option, try --help")
+    };
   };
 };
