@@ -19,3 +19,4 @@ rule token = parse
     | "^"   { CAROT }
     | "("   { LPAREN }
     | ")"   { RPAREN }
+    | eof   { EOF }
