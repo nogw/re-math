@@ -15,7 +15,7 @@ expect   - Int(10)
 received - Int(10)
 
 math     - (- (+ (^ 5 6) 16) (+ (^ 5 6) (/ 98 7)))
-ast     - (Bop (Subt, (Bop (Add, (Bop (Exp, (Int 5), (Int 6))), (Int 16))), (Bop (Add, (Bop (Exp, (Int 5), (Int 6))), (Bop (Div, (Int 98), (Int 7)))))))
+ast      - (Bop (Subt, (Bop (Add, (Bop (Exp, (Int 5), (Int 6))), (Int 16))), (Bop (Add, (Bop (Exp, (Int 5), (Int 6))), (Bop (Div, (Int 98), (Int 7)))))))
 expect   - Int(2)
 received - Int(2) (* ugly *)
 ```
