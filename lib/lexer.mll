@@ -35,15 +35,10 @@ rule token = parse
   | eof     { EOF }
   | _       { raise (SyntaxError ("[LEXER ERROR] Illegal character: " ^ Lexing.lexeme lexbuf)) }
 
-(* TODO *)
 and s_line_comment = parse
-  | '\n' { token lexbuf }
-  | _    { s_line_comment lexbuf } 
-
-and read_single_line_comment = parse
-| newline { next_line lexbuf; read_token lexbuf } 
-| eof { EOF }
-| _ { read_single_line_comment lexbuf } 
+| newline { next_line lexbuf; token lexbuf } 
+| eof     { EOF }
+| _       { s_line_comment lexbuf } 
 
 and m_line_comment = parse
   | "-}"    { token lexbuf } 
