@@ -15,7 +15,7 @@ prog:
 
 expr:
     | i = INT { Int i }
-    | b = binary_operation ; e = expr ; e1 = expr { BinaryOperation ( b, e, e1 ) }
+    | b = binary_operation ; e = expr ; e1 = expr { Bop ( b, e, e1 ) }
     | LPAREN ; e = expr ; RPAREN { e }
     ;
 

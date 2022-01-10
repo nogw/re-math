@@ -28,13 +28,13 @@ let is_value: expression => bool =
   fun
   | Int(_)
   | Var(_) => true
-  | BinaryOperation(_) => false;
+  | Bop(_) => false;
 
 let rec typeof = context => {
   fun
   | Var(_) => TVar
   | Int(_) => TInt
-  | BinaryOperation(b, e, e1) => typeof_binary_operation(context, b, e, e1);
+  | Bop(b, e, e1) => typeof_binary_operation(context, b, e, e1);
 }
 
 and typeof_binary_operation = (context, b, e, e1) => {
@@ -49,8 +49,8 @@ let rec subst = (expression, value, x) => {
   switch (expression) {
   | Var(y) => y == x ? value : expression
   | Int(_) => expression
-  | BinaryOperation(binary_operation, e, e1) =>
-    BinaryOperation(
+  | Bop(binary_operation, e, e1) =>
+    Bop(
       binary_operation,
       subst(e, value, x),
       subst(e1, value, x),

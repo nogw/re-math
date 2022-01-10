@@ -14,4 +14,4 @@ type binary_operations =
 type expression =
   | Int(int)
   | Var(variable)
-  | BinaryOperation(binary_operations, expression, expression);
+  | Bop(binary_operations, expression, expression);
