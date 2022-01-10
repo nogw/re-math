@@ -1,18 +1,17 @@
-let read_file = (filename: string): string => {
-  let ic = open_in(filename);
+let read_file = name => {
+  let ic = open_in(name);
   let try_read = () =>
     try(Some(input_line(ic))) {
     | End_of_file => None
     };
-  let rec aux = acc => {
+  let rec loop = acc =>
     switch (try_read()) {
-    | Some(s) => aux(acc ++ s)
+    | Some(s) => loop([s, ...acc])
     | None =>
       close_in(ic);
-      acc;
+      List.rev(acc) |> String.concat("\n");
     };
-  };
-  aux("");
+  loop([]);
 };
 
 open Cmdliner
