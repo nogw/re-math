@@ -1,27 +1,25 @@
 open Parse;
+open Typecheck;
 open Ast;
 
 let rec step: Ast.expression => Ast.expression =
   fun
-  | Int(_)
-  | Var(_) => failwith("does not step")
-  | BinaryOperation(binary_operation, e, e1)
-      when Typecheck.is_value(e) && Typecheck.is_value(e1) =>
-    step_binary_operation(binary_operation, e, e1)
-  | BinaryOperation(binary_operation, e, e1) when Typecheck.is_value(e) =>
-    BinaryOperation(binary_operation, e, step(e1))
-  | BinaryOperation(binary_operation, e, e1) =>
-    BinaryOperation(binary_operation, e, e1)
+  | Int(_) | Var(_) => failwith("does not step")
+  | Bop(bop, e, e') when !is_value(e)                  => step(Bop(bop, step(e), e'))
+  | Bop(bop, e, e') when !is_value(e')                 => step(Bop(bop, e, step(e')))
+  | Bop(bop, e, e') when !is_value(e) && !is_value(e') => step(Bop(bop, step(e), step(e')))
+  | Bop(bop, e, e') when is_value(e) && is_value(e')   => step_binop(bop, e, e')
+  | Bop(bop, e, e') when is_value(e)                   => Bop(bop, e, step(e'))
+  | Bop(bop, e, e')                                    => Bop(bop, e, e')
 
-and step_binary_operation = (binary_operation, e, e1) =>
-  switch (binary_operation, e, e1) {
-  | (Add, Int(a), Int(b)) => Int(a + b)
+and step_binop = (bop, e, e1) =>
+  switch (bop, e, e1) {
+  | (Add,  Int(a), Int(b)) => Int(a + b)
   | (Subt, Int(a), Int(b)) => Int(a - b)
   | (Mult, Int(a), Int(b)) => Int(a * b)
-  | (Div, Int(a), Int(b)) => Int(a / b)
-  | (Mod, Int(a), Int(b)) => Int(a mod b)
-  | (Exp, Int(a), Int(b)) =>
-    Int(int_of_float(float_of_int(a) ** float_of_int(b)))
+  | (Div,  Int(a), Int(b)) => Int(a / b)
+  | (Mod,  Int(a), Int(b)) => Int(a mod b)
+  | (Exp,  Int(a), Int(b)) => Int(int_of_float(float_of_int(a) ** float_of_int(b)))
   | _ => failwith("Operator and operand type mismatch")
   };
 
@@ -29,8 +27,7 @@ let eval = (e: expression): expression => {
   switch (e) {
   | Int(_)
   | Var(_) => e
-  | BinaryOperation(binary_operation, e, e1) =>
-    step_binary_operation(binary_operation, e, e1)
+  | Bop(bop, e, e1) => step(Bop(bop, e, e1))
   };
 };
 
@@ -42,36 +39,8 @@ let parse = (s: string): expression => {
 
 let interprete = (s: string): expression => {
   let e = parse(s);
-  Typecheck.typecheck(e);
+  typecheck(e);
   eval(e);
-};
-
-let input = prefix => {
-  print_string(prefix);
-  let str = read_line();
-  str;
-};
-
-let cli_options =
-  [
-    ["", "--help", "show usage information and exits"],
-    ["", "--ast", "show the AST for the file and exits"],
-  ]
-  |> List.map(String.concat("\t"))
-  |> String.concat("\n");
-
-let cli_usage = () => {
-  [
-    "USAGE: math file.math [options]",
-    "",
-    "OPTIONS:",
-    cli_options,
-    "",
-    "EXAMPLE:",
-    "\t$ math program.math",
-  ]
-  |> String.concat("\n")
-  |> print_endline;
 };
 
 let read_file = (filename: string): string => {
@@ -91,21 +60,30 @@ let read_file = (filename: string): string => {
   aux("");
 };
 
-let () = {
-  let len = Array.length(Sys.argv);
+open Cmdliner
 
-  if (len <= 1) {
-    cli_usage();
-  } else if (len <= 2) {
-    read_file(Sys.argv[1]) |> interprete |> show_expression |> print_endline;
-  } else {
-    let (filename, opt) = (Sys.argv[1], Sys.argv[2]);
+let file = Arg.(value & pos(0, some(string), None) & info([], ~doc="file: file that contains the code"));
+let ast  = Arg.(value & flag & info(["a", "ast"], ~doc="ast: display ast of code"))
 
-    switch (opt) {
-    | "--ast" =>
-      read_file(filename) |> parse |> show_expression |> print_endline
-    | "--help" => cli_usage()
-    | _ => print_endline("Invalid option, try --help")
-    };
-  };
-};
+let execute = (file, ast) => {
+  switch (file) {
+    | Some(file) => ast 
+      ? { read_file(file) |> parse |> show_expression |> print_endline } 
+      : { read_file(file) |> interprete |> show_expression |> print_endline }
+    | None => exit(1)
+  }
+}
+
+let cmd = () => {
+  Term.(const(execute) $ file $ ast)
+}
+
+let () = { 
+  let doc = "";
+  let man = [
+    `S (Manpage.s_synopsis),
+    `P ("parse-math [FILE.MATH] [ARG]"),
+    `S (Manpage.s_bugs), `P ("Report bugs to <github.com/nogw/reason-menhir/issues>.")]
+    
+  Term.exit @@ Term.eval((cmd(), Term.info("parse-math", ~version="v1.0.4", ~doc, ~man)));
+}
