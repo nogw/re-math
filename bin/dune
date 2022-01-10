@@ -1,5 +1,5 @@
 (executable
- (name math)
- (public_name math.exe)
+ (name cli)
+ (public_name cli.exe)
  (libraries parse cmdliner)
  (preprocess (pps ppx_deriving.show)))
