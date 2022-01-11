@@ -1,4 +1,4 @@
 # reason-math
 
 ## TODO
-- [  ] impl menhir
+- [ ] impl menhir
