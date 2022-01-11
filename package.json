@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "license": "MIT",
   "esy": {
-    "build": "dune build -p parser-math",
+    "build": "dune build -p #{self.name}",
     "buildsInSource": "_build",
     "release": {
       "releasedBinaries": [
-        "math.exe"
+        "cli.exe"
       ]
     }
   },
   "scripts": {
-	"start": "esy x math.exe"
+  	"start": "esy x cli.exe"
   },
   "dependencies": {
     "ocaml": "~4.11.0",

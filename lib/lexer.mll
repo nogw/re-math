@@ -33,7 +33,13 @@ rule token = parse
   | int     { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | newline { next_line lexbuf; token lexbuf }
   | eof     { EOF }
-  | _       { raise (SyntaxError ("[LEXER ERROR] Illegal character: " ^ Lexing.lexeme lexbuf)) }
+  | _       { raise (SyntaxError (
+              "[LEXER ERROR] Illegal character: \'" 
+              ^ Lexing.lexeme lexbuf 
+              ^ "\' at " 
+              ^ string_of_int(lexbuf.lex_curr_p.pos_lnum) 
+              ^ ":" 
+              ^ string_of_int(lexbuf.lex_curr_p.pos_cnum) ))}
 
 and s_line_comment = parse
 | newline { next_line lexbuf; token lexbuf } 
@@ -43,5 +49,9 @@ and s_line_comment = parse
 and m_line_comment = parse
   | "-}"    { token lexbuf } 
   | newline { next_line lexbuf; m_line_comment lexbuf } 
-  | eof     { raise ( SyntaxError ("[LEXER ERROR] Unclosed comment at " ^ Lexing.lexeme lexbuf)) }
+  | eof     { raise ( SyntaxError (
+              "[LEXER ERROR] Unclosed comment at " 
+              ^ string_of_int(lexbuf.lex_curr_p.pos_lnum) 
+              ^ ":" 
+              ^ string_of_int(lexbuf.lex_curr_p.pos_cnum) )) }
   | _       { m_line_comment lexbuf } 
