@@ -21,10 +21,10 @@ let ast  = Arg.(value & flag & info(["a", "ast"], ~doc="ast: display ast of code
 
 let execute = (file, ast) => {
   switch (file) {
-    | Some(file) => ast 
+    | Some(file) => ast
       ? { read_file(file) |> Math.parse |> Parse.Ast.show_expression |> print_endline } 
       : { read_file(file) |> Math.interprete |> Parse.Ast.show_expression |> print_endline }
-    | None => exit(1)
+    | None => Parse.Readline.repl((s) => s |> Math.parse |> Parse.Ast.show_expression |> print_endline)
   }
 }
 
@@ -32,12 +32,11 @@ let cmd = () => {
   Term.(const(execute) $ file $ ast)
 }
 
-let () = { 
+let () = {
   let doc = "";
   let man = [
     `S (Manpage.s_synopsis),
     `P ("parse-math [FILE.MATH] [ARG]"),
     `S (Manpage.s_bugs), `P ("Report bugs to <github.com/nogw/reason-menhir/issues>.")]
-    
   Term.exit @@ Term.eval((cmd(), Term.info("parse-math", ~version="v1.0.4", ~doc, ~man)));
 }
